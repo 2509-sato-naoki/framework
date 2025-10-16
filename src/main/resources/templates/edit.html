@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="UTF-8">
+    <title>投稿編集画面</title>
+</head>
+<body>
+<div class="header-contents">
+    <h1>投稿編集</h1>
+</div>
+
+<div class="main-contents">
+    <div class="message-icon" th:each="formModel : ${formModel}">
+
+        <div class="text">
+            <form method="post" th:action="@{/update/{id}(id=${formModel.id})}">
+                <textarea th:field="*{formModel.content}"></textarea>
+                <input type="submit" value="編集する" />
+            </form>
+        </div>
+    </div>
+</div>
+</body>
+</html>

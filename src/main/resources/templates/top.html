@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="UTF-8">
+    <link th:href="@{/css/style.css}" rel="styleSheet">
+    <title>TOP</title>
+</head>
+<body>
+<div class="header-contents">
+    <h1>匿名掲示板</h1>
+</div>
+<div class="main-contents">
+    <a href="/new">
+        <button class="new-button" type="button">新規投稿</button>
+    </a>
+    <div class="message-icon" th:each="content : ${contents}">
+        <div>
+            ID : <span th:text="${content.id}"/>
+        </div>
+        <div class="text">
+            投稿 : <span th:text="${content.content}"/>
+        </div>
+
+        <!--情報をURLパラメータとして渡したい-->
+        <!--spring boot独自のやり方を使って動作するようにする-->
+        <form method="post" th:action="@{/delete/{id}(id=${content.id})}">
+            <div class="form-area">
+                <input type="submit" value="削除" />
+            </div>
+        </form>
+
+        <!--投稿編集画面の表示-->
+        <form method="get" th:action="@{/edit/{id}(id=${content.id})}">
+            <div class="form-area">
+                <input type="submit" value="編集する" />
+            </div>
+        </form>
+    </div>
+</div>
+</body>
+</html>
