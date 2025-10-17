@@ -1,7 +1,9 @@
 package com.example.forum.controller;
 
+import com.example.forum.controller.form.CommentForm;
 import com.example.forum.controller.form.ReportForm;
 import com.example.forum.repository.entity.Report;
+import com.example.forum.service.CommentService;
 import com.example.forum.service.ReportService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -16,6 +18,9 @@ public class ForumController {
     @Autowired
     ReportService reportService;
 
+    @Autowired
+    CommentService commentService;
+
     /*
      * 投稿内容表示処理
      */
@@ -24,10 +29,13 @@ public class ForumController {
         ModelAndView mav = new ModelAndView();
         // 投稿を全権取得
         List<ReportForm> contentData = reportService.findAllReport();
+        // 返信を全権取得
+        List<CommentForm> commentData = commentService.findAllComment();
         // 画面遷移先を指定
         mav.setViewName("/top");
         // 投稿データオブジェクトを補完
         mav.addObject("contents", contentData);
+        mav.addObject("comments", commentData);
         return mav;
     }
 
@@ -95,6 +103,18 @@ public class ForumController {
         // 送る用の空のentitty
         reportForm.setId(contentId);
         reportService.saveReport(reportForm);
+        return new ModelAndView("redirect:/");
+    }
+
+    /*
+    * コメント返信処理
+     */
+    @PostMapping("/comment")
+    public ModelAndView commentContent(@RequestParam("comment") String comment, @RequestParam("reportId") int reportId) {
+        CommentForm commentForm = new CommentForm();
+        commentForm.setComment(comment);
+        commentForm.setReportId(reportId);
+        commentService.saveComment(commentForm);
         return new ModelAndView("redirect:/");
     }
 }

@@ -43,8 +43,6 @@ public class ReportService {
         return reports;
     }
 
-
-
     /*
      * レコード追加
      */

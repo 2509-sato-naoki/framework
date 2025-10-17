@@ -35,6 +35,22 @@
                 <input type="submit" value="編集する" />
             </div>
         </form>
+
+
+        <div class="commentdata" th:each="comment : ${comments}">
+            <div th:if="${comment.reportId == content.id}">
+                <p th:text="${comment.comment}"></p>
+            </div>
+        </div>
+
+
+        <form method="post" action="comment">
+            <div class="form-area">
+                <textarea class="tweet-box"  size="20" maxlength="200" name="comment"/></textarea><br/>
+                <input type="hidden" name="reportId" th:value="${content.id}">
+                <input type="submit" value="コメントする" />
+            </div>
+        </form>
     </div>
 </div>
 </body>

@@ -10,16 +10,18 @@ import lombok.Getter;
 import lombok.Setter;
 
 @Entity
-@Table(name = "report")
 @Getter
 @Setter
-public class Report {
+@Table(name="comments")
+public class Comment {
     @Id
     @Column
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
 
     @Column
-    private String content;
+    private int reportId;
 
+    @Column
+    private String content;
 }
