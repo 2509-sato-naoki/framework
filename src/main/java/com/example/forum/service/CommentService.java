@@ -56,4 +56,16 @@ public class CommentService {
         }
         return comments;
     }
+
+    public CommentForm editComment(int commentId) {
+        List<Comment> comments = new ArrayList<>();
+        comments.add(commentRepository.findById(commentId).orElse(null));
+        List<CommentForm> commentForm = setCommentForm(comments);
+        return commentForm.get(0);
+    }
+
+    public void deleteComment(int id) {
+        commentRepository.deleteById(id);
+    }
+
 }

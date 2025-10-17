@@ -117,4 +117,38 @@ public class ForumController {
         commentService.saveComment(commentForm);
         return new ModelAndView("redirect:/");
     }
+
+    /*
+    * コメント編集画面表示処理
+     */
+    @GetMapping("/commentEdit/{commentId}")
+    public ModelAndView commentEditContent(@PathVariable("commentId") int commentId) {
+        ModelAndView mav = new ModelAndView();
+        //画面遷移先を指定
+        mav.setViewName("/commentEdit");
+        CommentForm commentForm = commentService.editComment(commentId);
+        mav.addObject("formModel", commentForm);
+        return mav;
+    }
+
+    /*
+    * コメント編集処理
+     */
+    @PostMapping("/updateComment/{id}")
+    public ModelAndView updateCommentContent(@PathVariable("id") int id, @RequestParam("reportId") int reportId,
+                                             @ModelAttribute("formModel") CommentForm commentForm) {
+        commentForm.setId(id);
+        commentForm.setReportId(reportId);
+        commentService.saveComment(commentForm);
+        return new ModelAndView("redirect:/");
+    }
+
+    /*
+    *　コメント削除処理
+     */
+    @DeleteMapping("/commentDelete/{id}")
+    public ModelAndView commentDeleteContent(@PathVariable("id") int id) {
+        commentService.deleteComment(id);
+        return new ModelAndView("redirect:/");
+    }
 }

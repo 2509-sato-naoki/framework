@@ -40,6 +40,12 @@
         <div class="commentdata" th:each="comment : ${comments}">
             <div th:if="${comment.reportId == content.id}">
                 <p th:text="${comment.comment}"></p>
+                <form method="get" th:action="@{/commentEdit/{id}(id=${comment.id})}">
+                    <input type="submit" value="コメントを編集する">
+                </form>
+                <form th:method="delete" th:action="@{/commentDelete/{id}(id=${comment.id})}">
+                    <input type="submit" value="コメントを削除する">
+                </form>
             </div>
         </div>
 
