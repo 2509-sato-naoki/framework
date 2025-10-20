@@ -8,6 +8,9 @@ import com.example.forum.service.ReportService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.stereotype.Controller;
+import org.springframework.validation.BindingResult;
+import org.springframework.validation.FieldError;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 
@@ -76,11 +79,20 @@ public class ForumController {
      * 新規投稿処理
      */
     @PostMapping("/add")
-    public ModelAndView addContent(@ModelAttribute("formModel") ReportForm reportForm){
+    public ModelAndView addContent(@ModelAttribute("formModel") @Validated ReportForm reportForm, BindingResult
+            result){
         // 投稿をテーブルに格納
         reportService.saveReport(reportForm);
         // rootへリダイレクト
         return new ModelAndView("redirect:/");
+
+        //バリデーション
+//        if (result.hasErrors()) {
+//            for (FieldError error : result.getFieldErrors()) {
+//                String field = error.getField();
+//                String message = error.getDefaultMessage();
+//            }
+//        }
     }
 
     /*

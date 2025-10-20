@@ -32,4 +32,16 @@ public class Report {
     @LastModifiedDate
     private LocalDateTime updatedDate;
 
+
+    @PrePersist
+    public void onPrePersist() {
+        this.createdDate = LocalDateTime.now();
+        this.updatedDate = LocalDateTime.now();
+    }
+
+//    @PreUpdate
+//    public void onPreUpdate() {
+//        this.updatedDate = LocalDateTime.now();
+//    }
+
 }
