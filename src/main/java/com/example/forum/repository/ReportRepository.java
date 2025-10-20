@@ -10,5 +10,5 @@ import java.util.List;
 @Repository
 public interface ReportRepository extends JpaRepository<Report, Integer> {
     public List<Report> findAllByOrderByIdDesc();
-    List<Report> findByStartDateBetweenOrderByIdDesc(LocalDateTime startDate, LocalDateTime endDate);
+    List<Report> findByCreatedDateBetweenOrderByUpdatedDateDesc(LocalDateTime startDate, LocalDateTime endDate);
 }

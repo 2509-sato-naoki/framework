@@ -25,14 +25,14 @@ public class ReportService {
      */
     public List<ReportForm> findAllReport(LocalDateTime startDate, LocalDateTime endDate) {
 //        List<Report> results = reportRepository.findAllByOrderByIdDesc();
-        List<Report> results = reportRepository.findByStartDateBetweenOrderByIdDesc(startDate, endDate);
+        List<Report> results = reportRepository.findByCreatedDateBetweenOrderByUpdatedDateDesc(startDate, endDate);
         List<ReportForm> reports = setReportForm(results);
         return reports;
     }
     /*
      * DBから取得したデータをFormに設定
      */
-    private List<ReportForm> setReportForm(List<Report> results) {
+    public List<ReportForm> setReportForm(List<Report> results) {
         List<ReportForm> reports = new ArrayList<>();
 
         for (int i = 0; i < results.size(); i++) {
@@ -60,6 +60,7 @@ public class ReportService {
         Report report = new Report();
         report.setId(reqReport.getId());
         report.setContent(reqReport.getContent());
+        report.setUpdatedDate(reqReport.getUpdatedDate());
         return report;
     }
 

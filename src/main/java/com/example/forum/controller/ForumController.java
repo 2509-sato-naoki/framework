@@ -13,6 +13,7 @@ import org.springframework.web.servlet.ModelAndView;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
@@ -119,6 +120,8 @@ public class ForumController {
     public ModelAndView updateContent(@PathVariable("contentId") int contentId, @ModelAttribute("formModel") ReportForm reportForm) {
         // 送る用の空のentitty
         reportForm.setId(contentId);
+        LocalDateTime localDatetime = LocalDateTime.now();
+        reportForm.setUpdatedDate(localDatetime);
         reportService.saveReport(reportForm);
         return new ModelAndView("redirect:/");
     }
@@ -132,6 +135,18 @@ public class ForumController {
         commentForm.setComment(comment);
         commentForm.setReportId(reportId);
         commentService.saveComment(commentForm);
+
+        //⽇付で投稿を絞り込むことができる機能を追加
+        Optional<Report> optionalReport = reportService.selectReport(reportId);
+        Report report = optionalReport.get();
+        List<Report> reportList = new ArrayList<>();
+        reportList.add(report);
+        List<ReportForm> reportFormList = new ArrayList<>();
+        reportFormList = reportService.setReportForm(reportList);
+        ReportForm reportForm = reportFormList.get(0);
+        LocalDateTime nowDate = LocalDateTime.now();
+        reportForm.setUpdatedDate(nowDate);
+        reportService.saveReport(reportForm);
         return new ModelAndView("redirect:/");
     }
 

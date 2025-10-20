@@ -26,10 +26,10 @@ public class Report {
 
     @Column(name = "created_date",updatable = false)
     @CreatedDate
-    private LocalDateTime startDate;
+    private LocalDateTime createdDate;
 
     @Column(name = "updated_date")
     @LastModifiedDate
-    private LocalDateTime createdDate;
+    private LocalDateTime updatedDate;
 
 }
