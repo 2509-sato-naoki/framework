@@ -6,10 +6,14 @@ import com.example.forum.repository.entity.Report;
 import com.example.forum.service.CommentService;
 import com.example.forum.service.ReportService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
@@ -25,10 +29,23 @@ public class ForumController {
      * 投稿内容表示処理
      */
     @GetMapping
-    public ModelAndView top() {
+    public ModelAndView top(@RequestParam(required = false) @DateTimeFormat(pattern = "yyyy/MM/dd HH:mm:ss") LocalDate startDate,
+                            @RequestParam(required = false) @DateTimeFormat(pattern = "yyyy/MM/dd HH:mm:ss") LocalDate  endDate) {
         ModelAndView mav = new ModelAndView();
         // 投稿を全権取得
-        List<ReportForm> contentData = reportService.findAllReport();
+        LocalDateTime startDateTime;
+        LocalDateTime endDateTime;
+        if (startDate == null) {
+            startDateTime = LocalDateTime.of(2020, 1, 1, 0, 0);
+        } else {
+            startDateTime = startDate.atStartOfDay();
+        }
+        if (endDate == null) {
+            endDateTime = LocalDateTime.now();
+        } else {
+            endDateTime = endDate.atTime(23, 59, 59);
+        }
+        List<ReportForm> contentData = reportService.findAllReport(startDateTime, endDateTime);
         // 返信を全権取得
         List<CommentForm> commentData = commentService.findAllComment();
         // 画面遷移先を指定

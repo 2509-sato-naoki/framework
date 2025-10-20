@@ -8,6 +8,7 @@ import lombok.Setter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -22,8 +23,9 @@ public class ReportService {
     /*
      * レコード全件取得処理
      */
-    public List<ReportForm> findAllReport() {
-        List<Report> results = reportRepository.findAllByOrderByIdDesc();
+    public List<ReportForm> findAllReport(LocalDateTime startDate, LocalDateTime endDate) {
+//        List<Report> results = reportRepository.findAllByOrderByIdDesc();
+        List<Report> results = reportRepository.findByStartDateBetweenOrderByIdDesc(startDate, endDate);
         List<ReportForm> reports = setReportForm(results);
         return reports;
     }
