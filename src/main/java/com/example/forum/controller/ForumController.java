@@ -5,6 +5,8 @@ import com.example.forum.controller.form.ReportForm;
 import com.example.forum.repository.entity.Report;
 import com.example.forum.service.CommentService;
 import com.example.forum.service.ReportService;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.Conventions;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -119,7 +121,7 @@ public class ForumController {
      */
     @GetMapping("/edit/{contentId}")
     public ModelAndView editContent(@PathVariable("contentId") int contentId,
-                                    @ModelAttribute("formModel") ReportForm formModel) {
+                                    @ModelAttribute("formModel") ReportForm formModel, BindingResult result) {
         ModelAndView mav = new ModelAndView();
         // 画面遷移先を指定
         mav.setViewName("edit");
@@ -133,6 +135,9 @@ public class ForumController {
             mav.addObject("formModel", form);
         } else {
             mav.addObject("formModel", formModel);
+            //result””に囲まれていない方はそのままで、第一引数は　
+            //ここでBindingResultのBindingResult.<フォーム名>　個々のフォーム名には自分が設定した者が入る
+//            mav.addObject("BindingResult.formModel", result);
         }
 
         return mav;
@@ -147,11 +152,14 @@ public class ForumController {
                                       BindingResult result, RedirectAttributes redirectAttributes) {
         // 送る用の空のentitty
         if (result.hasErrors()) {
-            redirectAttributes.addFlashAttribute(formModel); // (1)
-            redirectAttributes.addFlashAttribute(
-                    BindingResult.MODEL_KEY_PREFIX +
-                            Conventions.getVariableName(formModel), result);
+            redirectAttributes.addFlashAttribute("errorMessages", "投稿内容を入力してください");
             return new ModelAndView("redirect:/edit/" + contentId);
+
+//            redirectAttributes.addFlashAttribute(formModel);
+//            redirectAttributes.addFlashAttribute(
+//                    BindingResult.MODEL_KEY_PREFIX +
+//                            Conventions.getVariableName(formModel), result);
+//            return new ModelAndView("redirect:/edit/" + contentId);
         } else {
             formModel.setId(contentId);
             LocalDateTime localDatetime = LocalDateTime.now();
@@ -165,12 +173,13 @@ public class ForumController {
     * コメント返信処理
      */
     @PostMapping("/comment")
-    public ModelAndView commentContent(@RequestParam("comment")  @Validated String comment, BindingResult result,
-                                       @RequestParam("reportId") int reportId) {
-        if (result.hasErrors()) {
-            ModelAndView mav = new ModelAndView();
-            mav.setViewName("/");
-            return mav;
+    public ModelAndView commentContent(@RequestParam("comment")  String comment,
+                                       @RequestParam("reportId") int reportId, RedirectAttributes redirectAttributes) {
+
+        if (comment.isBlank()) {
+            redirectAttributes.addFlashAttribute("errorMessages", "コメントを入力してください");
+            redirectAttributes.addFlashAttribute("id", reportId);
+            return new ModelAndView("redirect:/");
         } else {
             CommentForm commentForm = new CommentForm();
             commentForm.setComment(comment);
@@ -210,7 +219,11 @@ public class ForumController {
      */
     @PostMapping("/updateComment/{id}")
     public ModelAndView updateCommentContent(@PathVariable("id") int id, @RequestParam("reportId") int reportId,
-                                             @ModelAttribute("formModel") CommentForm commentForm) {
+                                             @ModelAttribute("formModel") CommentForm commentForm, RedirectAttributes redirectAttributes) {
+        if (commentForm.getComment().isBlank()) {
+            redirectAttributes.addFlashAttribute("errorMessages", "コメントを入力してください");
+            return new ModelAndView("redirect:/commentEdit/" + id);
+        }
         commentForm.setId(id);
         commentForm.setReportId(reportId);
         commentService.saveComment(commentForm);

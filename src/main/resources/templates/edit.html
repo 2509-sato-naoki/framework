@@ -8,7 +8,9 @@
 <div class="header-contents">
     <h1>投稿編集</h1>
 </div>
-
+<div th:if="${errorMessages != null}">
+    <p th:text="${errorMessages}"></p>
+</div>
 <div class="main-contents">
 <!--    <div class="message-icon" th:each="formModel : ${formModel}">-->
 <!--        <div class="text">-->

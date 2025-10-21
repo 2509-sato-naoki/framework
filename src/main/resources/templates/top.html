@@ -60,9 +60,11 @@
 
         <form method="post" action="comment">
             <div class="form-area">
-<!--                <p th:if="${#fields.hasErrors('comment')}"-->
-<!--                   th:errors="*{comment}"-->
-<!--                   style="color:red"></p>-->
+                <div th:if="${id == content.id}">
+                    <div th:if="${errorMessages != null}">
+                        <p th:text="${errorMessages}"></p>
+                    </div>
+                </div>
                 <textarea class="tweet-box"  size="20" maxlength="200" name="comment"/></textarea><br/>
                 <input type="hidden" name="reportId" th:value="${content.id}">
                 <input type="submit" value="コメントする" />
