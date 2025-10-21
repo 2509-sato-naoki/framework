@@ -9,6 +9,7 @@
 <div class="header-contents">
     <h1>匿名掲示板</h1>
 </div>
+
 <div class="main-contents">
     <a href="/new">
         <button class="new-button" type="button">新規投稿</button>
@@ -59,6 +60,9 @@
 
         <form method="post" action="comment">
             <div class="form-area">
+<!--                <p th:if="${#fields.hasErrors('comment')}"-->
+<!--                   th:errors="*{comment}"-->
+<!--                   style="color:red"></p>-->
                 <textarea class="tweet-box"  size="20" maxlength="200" name="comment"/></textarea><br/>
                 <input type="hidden" name="reportId" th:value="${content.id}">
                 <input type="submit" value="コメントする" />

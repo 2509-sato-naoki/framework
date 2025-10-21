@@ -10,9 +10,13 @@
     <h2>新規投稿</h2>
 </div>
 <div class="main-contents">
+
     <form method="post" action="/add" th:object="${formModel}">
         <div class="form-area">
-            <label>投稿内容</label>
+            <p th:if="${#fields.hasErrors('content')}"
+               th:errors="*{content}"
+               style="color:red"></p>
+           <label>投稿内容</label>
             <textarea class="tweet-box" th:field="*{content}" size="20" maxlength="200" /></textarea><br/>
             <input type="submit" value="投稿" />
         </div>

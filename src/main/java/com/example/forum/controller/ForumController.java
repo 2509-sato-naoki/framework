@@ -6,18 +6,19 @@ import com.example.forum.repository.entity.Report;
 import com.example.forum.service.CommentService;
 import com.example.forum.service.ReportService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.Conventions;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.BindingResult;
-import org.springframework.validation.FieldError;
+import org.springframework.validation.ObjectError;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
@@ -81,18 +82,20 @@ public class ForumController {
     @PostMapping("/add")
     public ModelAndView addContent(@ModelAttribute("formModel") @Validated ReportForm reportForm, BindingResult
             result){
-        // 投稿をテーブルに格納
-        reportService.saveReport(reportForm);
-        // rootへリダイレクト
-        return new ModelAndView("redirect:/");
 
-        //バリデーション
-//        if (result.hasErrors()) {
-//            for (FieldError error : result.getFieldErrors()) {
-//                String field = error.getField();
-//                String message = error.getDefaultMessage();
-//            }
-//        }
+        //バリデーションの結果がBindingReslutに格納される
+        if (result.hasErrors()) {
+            //この中に
+            ModelAndView mav = new ModelAndView();
+            mav.setViewName("/new");
+            return mav;
+        } else {
+            // 投稿をテーブルに格納
+            reportService.saveReport(reportForm);
+            // rootへリダイレクト
+            return new ModelAndView("redirect:/");
+        }
+
     }
 
     /*
@@ -115,13 +118,23 @@ public class ForumController {
      * 投稿編集画面表示処理
      */
     @GetMapping("/edit/{contentId}")
-    public ModelAndView editContent(@PathVariable("contentId") int contentId) {
+    public ModelAndView editContent(@PathVariable("contentId") int contentId,
+                                    @ModelAttribute("formModel") ReportForm formModel) {
         ModelAndView mav = new ModelAndView();
         // 画面遷移先を指定
-        mav.setViewName("/edit");
-        Optional<Report> reportForm = reportService.selectReport(contentId);
-        Report optionalReportForm = reportForm.get();
-        mav.addObject("formModel", optionalReportForm);
+        mav.setViewName("edit");
+        if (formModel.getId() == 0) {
+            Optional<Report> reportForm = reportService.selectReport(contentId);
+            Report optionalReportForm = reportForm.get();
+            ReportForm form = new ReportForm();
+            form.setId(optionalReportForm.getId());
+            form.setContent(optionalReportForm.getContent());
+            form.setUpdatedDate(optionalReportForm.getUpdatedDate());
+            mav.addObject("formModel", form);
+        } else {
+            mav.addObject("formModel", formModel);
+        }
+
         return mav;
     }
 
@@ -129,37 +142,54 @@ public class ForumController {
      * 投稿編集処理
      */
     @PostMapping("/update/{contentId}")
-    public ModelAndView updateContent(@PathVariable("contentId") int contentId, @ModelAttribute("formModel") ReportForm reportForm) {
+    public ModelAndView updateContent(@PathVariable("contentId") int contentId,
+                                      @ModelAttribute("formModel") @Validated ReportForm formModel,
+                                      BindingResult result, RedirectAttributes redirectAttributes) {
         // 送る用の空のentitty
-        reportForm.setId(contentId);
-        LocalDateTime localDatetime = LocalDateTime.now();
-        reportForm.setUpdatedDate(localDatetime);
-        reportService.saveReport(reportForm);
-        return new ModelAndView("redirect:/");
+        if (result.hasErrors()) {
+            redirectAttributes.addFlashAttribute(formModel); // (1)
+            redirectAttributes.addFlashAttribute(
+                    BindingResult.MODEL_KEY_PREFIX +
+                            Conventions.getVariableName(formModel), result);
+            return new ModelAndView("redirect:/edit/" + contentId);
+        } else {
+            formModel.setId(contentId);
+            LocalDateTime localDatetime = LocalDateTime.now();
+            formModel.setUpdatedDate(localDatetime);
+            reportService.saveReport(formModel);
+            return new ModelAndView("redirect:/");
+        }
     }
 
     /*
     * コメント返信処理
      */
     @PostMapping("/comment")
-    public ModelAndView commentContent(@RequestParam("comment") String comment, @RequestParam("reportId") int reportId) {
-        CommentForm commentForm = new CommentForm();
-        commentForm.setComment(comment);
-        commentForm.setReportId(reportId);
-        commentService.saveComment(commentForm);
+    public ModelAndView commentContent(@RequestParam("comment")  @Validated String comment, BindingResult result,
+                                       @RequestParam("reportId") int reportId) {
+        if (result.hasErrors()) {
+            ModelAndView mav = new ModelAndView();
+            mav.setViewName("/");
+            return mav;
+        } else {
+            CommentForm commentForm = new CommentForm();
+            commentForm.setComment(comment);
+            commentForm.setReportId(reportId);
+            commentService.saveComment(commentForm);
 
-        //⽇付で投稿を絞り込むことができる機能を追加
-        Optional<Report> optionalReport = reportService.selectReport(reportId);
-        Report report = optionalReport.get();
-        List<Report> reportList = new ArrayList<>();
-        reportList.add(report);
-        List<ReportForm> reportFormList = new ArrayList<>();
-        reportFormList = reportService.setReportForm(reportList);
-        ReportForm reportForm = reportFormList.get(0);
-        LocalDateTime nowDate = LocalDateTime.now();
-        reportForm.setUpdatedDate(nowDate);
-        reportService.saveReport(reportForm);
-        return new ModelAndView("redirect:/");
+            //⽇付で投稿を絞り込むことができる機能を追加
+            Optional<Report> optionalReport = reportService.selectReport(reportId);
+            Report report = optionalReport.get();
+            List<Report> reportList = new ArrayList<>();
+            reportList.add(report);
+            List<ReportForm> reportFormList = new ArrayList<>();
+            reportFormList = reportService.setReportForm(reportList);
+            ReportForm reportForm = reportFormList.get(0);
+            LocalDateTime nowDate = LocalDateTime.now();
+            reportForm.setUpdatedDate(nowDate);
+            reportService.saveReport(reportForm);
+            return new ModelAndView("redirect:/");
+        }
     }
 
     /*

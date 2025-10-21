@@ -10,11 +10,26 @@
 </div>
 
 <div class="main-contents">
-    <div class="message-icon" th:each="formModel : ${formModel}">
-
+<!--    <div class="message-icon" th:each="formModel : ${formModel}">-->
+<!--        <div class="text">-->
+<!--            <form method="post" th:action="@{/update/{id}(id=${formModel.id})}">-->
+<!--                <p th:if="${#fields.hasErrors('content')}"-->
+<!--                   th:errors="*{content}"-->
+<!--                   style="color:red"></p>-->
+<!--                <textarea th:field="*{formModel.content}"></textarea>-->
+<!--                <input type="submit" value="編集する" />-->
+<!--            </form>-->
+<!--        </div>-->
+<!--    </div>-->
+    <div class="message-icon">
         <div class="text">
-            <form method="post" th:action="@{/update/{id}(id=${formModel.id})}">
-                <textarea th:field="*{formModel.content}"></textarea>
+            <form method="post" th:action="@{/update/{id}(id=${formModel.id})}" th:object="${formModel}">
+                <!-- エラーメッセージ -->
+                <p th:if="${#fields.hasErrors('content')}"
+                   th:errors="*{content}"
+                   style="color:red"></p>
+
+                <textarea th:field="*{content}"></textarea>
                 <input type="submit" value="編集する" />
             </form>
         </div>
